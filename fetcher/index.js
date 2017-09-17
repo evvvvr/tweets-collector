@@ -1,43 +1,23 @@
 'use strict';
 
-const Twitter = require('twitter');
-const config = require('./src/config');
+const database = require('./src/database');
+const fetcher = require('./src/fetcher');
+const logger = require('./src/logger');
 
-// eslint-disable-next-line no-console
-console.log(`Fetcher started\n`);
+logger.info(`Starting Fetcher...`);
 
-const twitterClient = new Twitter({
-  consumer_key: config.TWITTER_CONSUMER_KEY,
-  consumer_secret: config.TWITTER_CONSUMER_SECRET,
-  access_token_key: config.TWITTER_ACCESS_TOKEN_KEY,
-  access_token_secret: config.TWITTER_ACCESS_TOKEN_SECRET
-});
+database.open()
+  .then((db) => {
+    logger.info(`Fetching past tweets...`);
 
-twitterClient.get('search/tweets', {q: config.KEYWORDS_TO_FETCH})
-  .then((result) => {
-    // eslint-disable-next-line no-console
-    console.dir(result.statuses);
-  })
-  .then(() => {
-    const stream = twitterClient.stream('statuses/filter', {track: config.KEYWORDS_TO_FETCH});
-
-    stream.on('data', (event) => {
-      // eslint-disable-next-line no-console
-      console.log(`event is here\n`);
-      // eslint-disable-next-line no-console
-      console.dir(event);
-    });
-
-    stream.on('error', (err) => {
-      // eslint-disable-next-line no-console
-      console.log(`Error fetching tweets`);
-      // eslint-disable-next-line no-console
-      console.dir(err);
-    });
+    fetcher.getPastTweets(db)
+      .catch((err) => {
+        logger.error(`getting past tweets failed: `, err);
+      })
+      .then(() => {
+        db.close();
+      });
   })
   .catch((err) => {
-    // eslint-disable-next-line no-console
-    console.log(`Error fetching tweets`);
-    // eslint-disable-next-line no-console
-    console.dir(err);
+    logger.error(`error connecting to db: `, err);
   });
