@@ -29,5 +29,18 @@ module.exports = {
       .then(() => {
         return queries.markTweetsAsIndexed(db, indexedTweets);
       });
+  },
+
+  indexNewTweets (db) {
+    let indexedTweets;
+
+    return queries.getNewTweets(db)
+      .then((tweets) => {
+        indexedTweets = tweets;
+        return elastic.bulkIndex(tweets);
+      })
+      .then(() => {
+        return queries.markTweetsAsIndexed(db, indexedTweets);
+      });
   }
 };

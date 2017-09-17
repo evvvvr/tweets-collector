@@ -48,11 +48,13 @@ module.exports = {
   },
 
   bulkIndex (tweets) {
-    const bulkBody = tweets
-      .map((t) => getBulkBodyForTweet(t))
-      .reduce((res, tweetBulkBody) => res.concat(tweetBulkBody), []);
+    if (tweets.length) {
+      const bulkBody = tweets
+        .map((t) => getBulkBodyForTweet(t))
+        .reduce((res, tweetBulkBody) => res.concat(tweetBulkBody), []);
 
-    return elasticsearchClient.bulk({ body: bulkBody });
+      return elasticsearchClient.bulk({ body: bulkBody });
+    }
 
     function getBulkBodyForTweet (tweet) {
       return [
