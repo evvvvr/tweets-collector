@@ -9,5 +9,9 @@ module.exports = {
 
   insertTweets (db, tweets) {
     return db.collection('tweets').insertMany(tweets);
+  },
+
+  insertTweet (db, tweet) {
+    return db.collection('tweets').insert(tweet);
   }
 };

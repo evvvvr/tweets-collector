@@ -12,10 +12,11 @@ database.open()
 
     fetcher.getPastTweets(db)
       .catch((err) => {
-        logger.error(`getting past tweets failed: `, err);
+        logger.error(`Getting past tweets has failed: `, err);
       })
       .then(() => {
-        db.close();
+        logger.info(`Pulling new tweets...`);
+        fetcher.startPullingNewTweets(db);
       });
   })
   .catch((err) => {
