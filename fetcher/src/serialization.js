@@ -9,5 +9,11 @@ module.exports = {
 };
 
 function serializeTweet (tweet) {
-  return Object.assign({ _id: tweet.id_str }, tweet);
+  return Object.assign({
+    _id: tweet.id_str,
+    data: tweet,
+    metadata: {
+      indexed: false
+    }
+  });
 }

@@ -5,6 +5,8 @@ const elastic = require('./elastic');
 
 module.exports = {
   reindexTweets (db) {
+    let indexedTweets;
+
     return elastic.doesIndexExist()
       .then((indexExists) => {
         if (indexExists) {
@@ -21,7 +23,11 @@ module.exports = {
         return queries.getAllTweets(db);
       })
       .then((tweets) => {
+        indexedTweets = tweets;
         return elastic.bulkIndex(tweets);
+      })
+      .then(() => {
+        return queries.markTweetsAsIndexed(db, indexedTweets);
       });
   }
 };

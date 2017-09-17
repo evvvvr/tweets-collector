@@ -62,12 +62,12 @@ module.exports = {
 
       function mapTweet (tweet) {
         return {
-          text: tweet.text,
-          createdAt: tweet.created_at,
+          text: tweet.data.text,
+          createdAt: tweet.data.created_at,
           user: {
-            name: tweet.user.name,
-            screenName: tweet.user.screen_name,
-            profileImgUrl: tweet.user.profile_image_url
+            name: tweet.data.user.name,
+            screenName: tweet.data.user.screen_name,
+            profileImgUrl: tweet.data.user.profile_image_url
           }
         };
       }
