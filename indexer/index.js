@@ -17,7 +17,7 @@ elastic.checkConnection()
             db.close();
           })
           .catch((err) => {
-            logger.error(`Error indexing tweets `, err);
+            logger.error(`Error indexing tweets: `, err);
           });
       })
       .catch((err) => {
@@ -25,5 +25,5 @@ elastic.checkConnection()
       });
   })
   .catch((err) => {
-    logger.error(`Failed to connect to elasticsearch!`, err);
+    logger.error(`Failed to connect to elasticsearch: `, err);
   });

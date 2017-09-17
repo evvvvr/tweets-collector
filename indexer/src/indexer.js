@@ -21,20 +21,7 @@ module.exports = {
         return queries.getAllTweets(db);
       })
       .then((tweets) => {
-        console.log(`Tweets to index:\n`);
-        console.dir(tweets.map((t) => mapTweet(t)));
+        return elastic.bulkIndex(tweets);
       });
   }
-};
-
-function mapTweet (tweet) {
-  return {
-    id: tweet._id,
-    text: tweet.text,
-    createdAt: tweet.created_at,
-    user: {
-      name: tweet.user.name,
-      screenName: tweet.user.screen_name
-    }
-  };
 };

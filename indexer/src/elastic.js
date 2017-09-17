@@ -34,7 +34,7 @@ module.exports = {
           text: { type: 'text' },
           createdAt: {
             type: 'date',
-            format: 'EEE MMM dd HH:mm:ss ZZZZZ yyyy'
+            format: 'EEE MMM dd HH:mm:ss Z yyyy'
           },
           user: {
             properties: {
@@ -45,5 +45,32 @@ module.exports = {
         }
       }
     });
+  },
+
+  bulkIndex (tweets) {
+    const bulkBody = tweets
+      .map((t) => getBulkBodyForTweet(t))
+      .reduce((res, tweetBulkBody) => res.concat(tweetBulkBody), []);
+
+    return elasticsearchClient.bulk({ body: bulkBody });
+
+    function getBulkBodyForTweet (tweet) {
+      return [
+        { index: { _index: 'tweets', _type: 'tweet', _id: tweet._id } },
+        mapTweet(tweet)
+      ];
+
+      function mapTweet (tweet) {
+        return {
+          text: tweet.text,
+          createdAt: tweet.created_at,
+          user: {
+            name: tweet.user.name,
+            screenName: tweet.user.screen_name,
+            profileImgUrl: tweet.user.profile_image_url
+          }
+        };
+      }
+    }
   }
 };
