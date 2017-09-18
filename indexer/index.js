@@ -5,6 +5,7 @@ const database = require('./src/database');
 const elastic = require('./src/elastic');
 const indexer = require('./src/indexer');
 const logger = require('./src/logger');
+const config = require('./src/config');
 
 logger.info(`Indexer started`);
 
@@ -16,7 +17,10 @@ elastic.checkConnection()
           .then(() => {
             logger.info(`Tweets has been reindexed`);
 
-            schedule.scheduleJob('0 * * * * *', () => {
+            const cronSpec = config.INDEXER_JOB_CRON_SPEC;
+            logger.info(`Scheduling indexer job with cron spec '${cronSpec}'`);
+
+            schedule.scheduleJob(cronSpec, () => {
               logger.info(`Indexing new tweets...`);
 
               return indexer.indexNewTweets(db)

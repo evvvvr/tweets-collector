@@ -1,14 +1,13 @@
 'use strict';
 
+const config = require('./config');
 const MongoClient = require('mongodb').MongoClient;
-
-const mongoClientOptions = {
-  connectTimeoutMS: 5000
-};
 
 module.exports = {
   open () {
     return MongoClient
-      .connect('mongodb://192.168.99.100:27017/tweets-collector', mongoClientOptions);
+      .connect(config.DB_URL, {
+        connectTimeoutMS: config.DB_CONNECT_TIMEOUT_MS
+      });
   }
 };

@@ -1,11 +1,12 @@
 const elasticsearch = require('elasticsearch');
+const config = require('./config');
 
 const elasticsearchClient = new elasticsearch.Client({
-  host: '192.168.99.100:9200',
-  apiVersion: '5.6',
-  log: 'trace'
+  host: config.ELASTIC_HOST,
+  log: config.ELASTIC_LOG_LEVEL,
+  apiVersion: '5.6'
 });
-const indexName = 'tweets';
+const indexName = config.ELASTIC_INDEX_NAME;
 
 module.exports = {
   checkConnection () {
@@ -58,7 +59,7 @@ module.exports = {
 
     function getBulkBodyForTweet (tweet) {
       return [
-        { index: { _index: 'tweets', _type: 'tweet', _id: tweet._id } },
+        { index: { _index: indexName, _type: 'tweet', _id: tweet._id } },
         mapTweet(tweet)
       ];
 
