@@ -18,6 +18,8 @@ module.exports = {
   },
 
   searchTweets (text) {
+    const searchSize = 100;
+
     return elasticsearchClient.search({
       index: indexName,
       body: {
@@ -32,7 +34,7 @@ module.exports = {
         sort: [
           { createdAt: { order: 'desc' } }
         ],
-        size: 100
+        size: searchSize
       }
     });
   }
