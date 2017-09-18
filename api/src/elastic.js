@@ -1,17 +1,20 @@
 'use strict';
 
 const elasticsearch = require('elasticsearch');
+const config = require('./config');
 
 const elasticsearchClient = new elasticsearch.Client({
-  host: '192.168.99.100:9200',
+  host: config.ELASTIC_HOST,
+  log: config.ELASTIC_LOG_LEVEL,
   apiVersion: '5.6'
-  // log: 'trace'
 });
-const indexName = 'tweets';
+const indexName = config.ELASTIC_INDEX_NAME;
 
 module.exports = {
   checkConnection () {
-    return elasticsearchClient.ping({ requestTimeout: 5000 });
+    return elasticsearchClient.ping({
+      requestTimeout: config.ELASTIC_CONNECT_TIMEOUT_MS
+    });
   },
 
   searchTweets (text) {
