@@ -4,8 +4,8 @@ const elasticsearch = require('elasticsearch');
 
 const elasticsearchClient = new elasticsearch.Client({
   host: '192.168.99.100:9200',
-  apiVersion: '5.6',
-  log: 'trace'
+  apiVersion: '5.6'
+  // log: 'trace'
 });
 const indexName = 'tweets';
 
