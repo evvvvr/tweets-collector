@@ -1,3 +1,5 @@
+'use strict';
+
 const elasticsearch = require('elasticsearch');
 const config = require('./config');
 
