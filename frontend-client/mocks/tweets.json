@@ -1,0 +1,17 @@
+{
+    "tweets": {
+        "count": 2,
+        "items": [
+            {
+                "id": 123,
+                "text": "some tweet",
+                "createdAt": "Mon Sep 18 08:50:09 +0000 2017",
+                "user": {
+                    "screenName": "Cat",
+                    "name": "cat",
+                    "profileImgUrl": ""
+                }
+            }
+        ]
+    }
+}
