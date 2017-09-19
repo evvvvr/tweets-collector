@@ -32,3 +32,14 @@ services:
       - mongo
       - elasticsearch
     restart: unless-stopped
+  api:
+    build: ./api
+    volumes:
+      - ./api:/app
+    env_file:
+      - api.env
+    ports:
+      - 3030:3030
+    links:
+      - elasticsearch
+    restart: on-failure

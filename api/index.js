@@ -13,6 +13,7 @@ elastic.checkConnection()
   })
   .catch((err) => {
     logger.error(`Error starting API server: `, err);
+    process.exit(-1);
   });
 
 function startApplication () {
