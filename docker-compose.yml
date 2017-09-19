@@ -43,3 +43,12 @@ services:
     links:
       - elasticsearch
     restart: on-failure
+  frontend-client:
+    build: ./frontend-client
+    volumes:
+      - ./frontend-client:/app
+    ports:
+      - 3000:3000
+    links:
+      - api
+    restart: on-failure
