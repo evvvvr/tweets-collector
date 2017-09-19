@@ -1,15 +1,17 @@
+import config from '../../config';
+
 export const SEARCH_REQUEST = 'SEARCH_REQUEST';
 export const SEARCH_SUCCESS = 'SEARCH_SUCCESS';
 export const SEARCH_ERROR = 'SEARCH_ERROR';
 
-export function startRequest() {
+export function startRequest () {
   return {
     type: SEARCH_REQUEST,
     payload: {}
-  };
+  }
 };
 
-export function requestSuccess(resp) {
+export function requestSuccess (resp) {
   return {
     type: SEARCH_SUCCESS,
     payload: {
@@ -18,14 +20,14 @@ export function requestSuccess(resp) {
   };
 };
 
-export function requestError() {
+export function requestError () {
   return {
     type: SEARCH_ERROR,
     payload: {}
-  };
+  }
 };
 
-export function search() {
+export function search (query) {
   return (dispatch, getState) => {
     const {
       search: {
@@ -39,30 +41,24 @@ export function search() {
 
     dispatch(startRequest());
 
-    return fetch('http://localhost:3004/tweets', {
+    const searchEndpointUrl = `${config.API_HOST}/api/search`;
+    const encodedQuery = encodeURIComponent(query);
+    return fetch(`${searchEndpointUrl}?q=${encodedQuery}`, {
       method: 'get',
       headers: {
         'Accept': 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       }
     })
-    /*
-    .then(function (response) {
-      return response.json()
-    })
-    .catch (function (error) {
-      console.log('Request failed', error)
-    })
-   */
     .then(resp => resp.text()
       .then(data => resp.ok ? dispatch(requestSuccess(JSON.parse(data))) : Promise.reject())
     )
     .catch(e => {
       if (e instanceof Error) {
         console.error(e);
-      } 
+      }
 
       dispatch(requestError());
     })
   }
-}
+};
