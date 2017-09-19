@@ -21,3 +21,14 @@ services:
       - fetcher.env
     links:
       - mongo
+    restart: unless-stopped
+  indexer:
+    build: ./indexer
+    volumes:
+      - ./indexer:/app
+    env_file:
+      - indexer.env
+    links:
+      - mongo
+      - elasticsearch
+    restart: unless-stopped
