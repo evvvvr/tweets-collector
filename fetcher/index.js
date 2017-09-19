@@ -21,4 +21,5 @@ database.open()
   })
   .catch((err) => {
     logger.error(`error connecting to db: `, err);
+    process.exit(-1);
   });

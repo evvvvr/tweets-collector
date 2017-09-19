@@ -21,7 +21,7 @@ services:
       - fetcher.env
     links:
       - mongo
-    restart: unless-stopped
+    restart: on-failure
   indexer:
     build: ./indexer
     volumes:
