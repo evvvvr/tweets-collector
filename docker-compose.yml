@@ -31,7 +31,7 @@ services:
     links:
       - mongo
       - elasticsearch
-    restart: unless-stopped
+    restart: on-failure
   api:
     build: ./api
     volumes:

@@ -38,8 +38,10 @@ elastic.checkConnection()
       })
       .catch((err) => {
         logger.error(`Error connecting to db: `, err);
+        process.exit(-2);
       });
   })
   .catch((err) => {
     logger.error(`Failed to connect to elasticsearch: `, err);
+    process.exit(-1);
   });
