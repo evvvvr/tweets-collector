@@ -31,7 +31,7 @@ Further step is to use messaging to communicate between components:
 TODO: add messaging design diagram.
 
 This would also mean lower latency for tweets indexing as periodical search index 
-update would be replaced with updating index whenever new appears in 
+update would be replaced with updating index whenever new tweet appears in 
 indexer message queue.
 
 ### Fetcher
