@@ -3,14 +3,16 @@
 HTTP REST API (with a frontend client) to search tweets fetched by
 specific keyword via elasticsearch.
 
+TODO: add navigation
+
 ## Overall Design
-TODO: add design diagram
+![Overall Design Diagram](docs/diagram_1.png "Overall Design Diagram")
 
 Components are loosely coupled which allows to scale them independently
 and fail independently without affecting each other.
 
 As API and frontend client server share nothing and don't have any
-state they could be scaled by introducing new instances behind load balancer.
+state they could be scaled by introducing new instances behind a load balancer.
 
 Search index scaling is handled by Elasticsearch.
 
@@ -35,7 +37,8 @@ route them to indexer message queue and another queue from which tweets
 will be stored in database in order to save historical data between any restarts.
 This would mean lower latency for tweets indexing as periodical search index
 update would be replaced with updating index whenever new tweet appears in
-indexer message queue, however message brokers introduce other concers 
+indexer message queue, however message brokers introduce other concerns (e.g.
+congestion).
 
 ### Fetcher
 Gets tweets containing given keyword and stores them in database marked as not
@@ -59,37 +62,44 @@ between storing new tweets and indexing them.
 ### API
 HTTP server providing REST API with search endpoint querying Elasticsearch.
 Search results are limited to 100 latest tweets.
-TODO: add endpoint info
 
-## Considerations
-TODO: what to add here?
+Search endpoint is `/search?q=<words to search>`
+It will perform case insensetive search for tweets containig all of words specified
+in query separated by spaces.
 
 ## To Implement
-There also are some things which were not implemented.
+Although network ports used by applications are configurable and not hardcoded
+in each application itself, they are hardcoded in docker files and docker compose,
+ports should be fully configurable.
 
-Use something like nodemon to restart processes.
-
-Fetcher could start getting historical tweets via API and listening for new tweets
-via streaming API concurrently, or this parts could be further decoupled into
-two separate services.
+API host URL not configurable for frontend-client.
 
 Are graceful exits of services and graceful error handling and retries.
+
 Indexer now tries to bulk index all not indexed tweets - break bulk into chunks.
 Prevent indexer job to start again when its already running.
 
 Add API versioning.
 
+Introduce API limits: probably limit
+API improvements: search fields other then text, add simple query language.
+
+UI improvements: show errors, show twitter author profile, add link to tweet.
+
+Refactor code: flatten nested promises, change folders structure, improve error
+handling.
+
 ## How To Start
 Provide following env files for each component in top directory:
-   * fetcher.env
-   * indexer.env
-   * api.env
+* fetcher.env
+* indexer.env
+* api.env
 
 TODO: describe config for each component
 
 As a shortcut API server host URL is not configurable in frontend-client,
 so it should be changed in `frontend-client/src/config.js` file. I am using 
-docker machine on Mac so I place there result of runnig: `docker-machine ip default`
+docker machine on Mac so I place there result of runnig `docker-machine ip default` command.
 
 Run `docker-compose up` from a top level repo directory.
 
@@ -97,3 +107,6 @@ It takes some time to start all the services on my machine and they could become
 and return timeout errors. This behaviour started after dockerizing
 frontend-client, so one could remove it from docker-compose file and start as
 usual.
+
+Open frontend-client URL in browser.
+
