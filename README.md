@@ -72,9 +72,13 @@ Although network ports used by applications are configurable and not hardcoded
 in each application itself, they are hardcoded in docker files and docker compose,
 ports should be fully configurable.
 
+Use docker volumes or data containers to permanently store db data.
+
 API host URL not configurable for frontend-client.
 
 Are graceful exits of services and graceful error handling and retries.
+
+Retry connections to external services (db, search index) instead of failing.
 
 Indexer now tries to bulk index all not indexed tweets - break bulk into chunks.
 Prevent indexer job to start again when its already running.
@@ -108,5 +112,5 @@ and return timeout errors. This behaviour started after dockerizing
 frontend-client, so one could remove it from docker-compose file and start as
 usual.
 
-Open frontend-client URL in browser.
+Open frontend-client URL (http://<docker-machine ip>:3000) in browser.
 
