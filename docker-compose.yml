@@ -1,36 +1,51 @@
-version: '2'
+version: '2.3'
 
 services:
   mongo:
-    image: mongo
+    build: ./services/mongo
     ports:
       - "27017:27017"
-  elasticsearch:
-      image: docker.elastic.co/elasticsearch/elasticsearch:5.6.0
-      environment:
-        - discovery.type=single-node
-        - xpack.security.enabled=false
-        - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-      ports:
-        - 9200:9200
+    healthcheck:
+      test: ["CMD", "docker-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
   fetcher:
     build: ./fetcher
     volumes:
       - ./fetcher:/app
     env_file:
       - fetcher.env
-    links:
-      - mongo
+    depends_on:
+      mongo:
+        condition: service_healthy
     restart: on-failure
+  elasticsearch:
+    build: ./services/elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - 9200:9200
+    healthcheck:
+      test: ["CMD", "docker-healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
   indexer:
     build: ./indexer
     volumes:
       - ./indexer:/app
     env_file:
       - indexer.env
-    links:
-      - mongo
-      - elasticsearch
+    depends_on:
+      mongo:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
     restart: on-failure
   api:
     build: ./api
@@ -40,8 +55,15 @@ services:
       - api.env
     ports:
       - 3030:3030
-    links:
-      - elasticsearch
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3030/healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
     restart: on-failure
   frontend-client:
     build: ./frontend-client
@@ -49,6 +71,13 @@ services:
       - ./frontend-client:/app
     ports:
       - 3000:3000
-    links:
-      - api
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    depends_on:
+      api:
+        condition: service_healthy
     restart: on-failure
