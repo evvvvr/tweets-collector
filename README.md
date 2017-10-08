@@ -94,23 +94,23 @@ Refactor code: flatten nested promises, change folders structure, improve error
 handling.
 
 ## How To Start
-Provide following env files for each component in top directory:
-* fetcher.env
-* indexer.env
-* api.env
 
-TODO: describe config for each component
+### Prerequisites
+
+- Docker Compose >= 2.3
+
+- Config files for each component in a top directory:
+  - fetcher.env
+  - indexer.env
+  - api.env
+
+  TODO: describe config for each component
 
 As a shortcut API server host URL is not configurable in frontend-client,
 so it should be changed in `frontend-client/src/config.js` file. I am using 
 docker machine on Mac so I place there result of runnig `docker-machine ip default` command.
 
-Run `docker-compose up` from a top level repo directory.
+Run `docker-compose up` from a top level repo directory (it takes some time to start
+all the services, index tweets etc.)
 
-It takes some time to start all the services on my machine and they could become slow
-and return timeout errors. This behaviour started after dockerizing
-frontend-client, so one could remove it from docker-compose file and start as
-usual.
-
-Open frontend-client URL (http://<docker-machine ip>:3000) in browser.
-
+Open frontend-client URL (http://docker-machine ip address:3000) in a browser.
