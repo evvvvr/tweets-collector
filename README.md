@@ -1,44 +1,37 @@
 # Tweets Collector
 
 HTTP REST API (with a frontend client) to search tweets fetched by
-specific keyword via elasticsearch.
+specific keyword via Elasticsearch.
 
 TODO: add navigation
 
 ## Overall Design
 ![Overall Design Diagram](docs/diagram_1.png "Overall Design Diagram")
 
-Components are loosely coupled which allows to scale them independently
-and fail independently without affecting each other.
-
-As API and frontend client server share nothing and don't have any
-state they could be scaled by introducing new instances behind a load balancer.
-
-Search index scaling is handled by Elasticsearch.
-
-Database could be scaled by introducing sharded cluster (MongoDB is used).
-Then multiple indexer instances could be introduced each indexing different db
-shards.
-
-One db instance is single point of failure which could be mitigated by
-introducing replica set (or by using messaging to communicate between components
-and get tweets to index from message queue, see below).
-
-Components are decoupled and could be replaced with different implementations
-while respecting the data model/communications protocol.
+Also, there is an option to use Logstash to fetch tweets and save them in database
+and index.
 
 Further step more towards [Staged event-driven architecture](https://en.wikipedia.org/wiki/Staged_event-driven_architecture)
 would be to use message broker to communicate between components. See diagram:
 TODO: add messaging design diagram.
-
-In this case fetcher will put new tweets inside something like
-[RabbitMQ exchange](http://rubybunny.info/articles/exchanges.html) which will
-route them to indexer message queue and another queue from which tweets
+In this case fetcher will put new tweets inside [RabbitMQ exchange](http://rubybunny.info/articles/exchanges.html)
+which will route them to indexer message queue and another queue from which tweets
 will be stored in database in order to save historical data between any restarts.
 This would mean lower latency for tweets indexing as periodical search index
 update would be replaced with updating index whenever new tweet appears in
 indexer message queue, however message brokers introduce other concerns (e.g.
 congestion).
+
+However this approach is prone to data deluge because of two independent writes.
+If one of them fails then we will have inconsistent data.
+Better approach is to have database as a single source of truth and
+use [Change Data Capture](https://en.wikipedia.org/wiki/Change_data_capture).
+Fetcher will write new tweets to database first which will appear in stream of changes.
+Indexer adds tweets from stream of changes to Elasticsearch either when new tweet appears
+there or periodically scans stream of changes to add new tweets in batches.
+Indexer should support starting with adding existing tweets from db to Elasticsearch.
+
+TODO: insert diagram here
 
 ### Fetcher
 Gets tweets containing given keyword and stores them in database marked as not
@@ -83,9 +76,7 @@ Retry connections to external services (db, search index) instead of failing.
 Indexer now tries to bulk index all not indexed tweets - break bulk into chunks.
 Prevent indexer job to start again when its already running.
 
-Add API versioning.
-
-Introduce API limits: probably limit
+Introduce API limits: throttle check search API call
 API improvements: search fields other then text, add simple query language.
 
 UI improvements: show errors, show twitter author profile, add link to tweet.
